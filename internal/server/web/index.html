@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111419">
+  <title>NeonDrop</title>
+  <link rel="stylesheet" href="/styles.css?v=2">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="NeonDrop home">
+        <span class="brand-mark">N</span>
+        <span>
+          <strong>NeonDrop</strong>
+          <small>Local clipboard and files</small>
+        </span>
+      </a>
+      <div class="top-actions">
+        <span class="network-badge"><span class="status-dot online"></span>LAN only</span>
+        <button class="icon-button" id="edit-device" type="button" title="Edit device name" aria-label="Edit device name">⚙</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="device-panel" aria-label="Devices">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Current network</p>
+            <h1>Devices</h1>
+          </div>
+          <span class="device-count" id="device-count">0 online</span>
+        </div>
+
+        <div class="this-device" id="this-device">
+          <span class="device-symbol">◎</span>
+          <span>
+            <strong>Connecting…</strong>
+            <small>This device</small>
+          </span>
+        </div>
+
+        <div class="device-list" id="device-list" role="listbox" aria-label="Available devices"></div>
+
+        <div class="share-address">
+          <span>Open on another device</span>
+          <button id="copy-address" class="address-button" type="button">
+            <code id="server-address">Loading…</code>
+            <span aria-hidden="true">⧉</span>
+          </button>
+        </div>
+      </aside>
+
+      <section class="transfer-workspace">
+        <div class="recipient-bar">
+          <div>
+            <p class="eyebrow">Send to</p>
+            <div class="recipient-name">
+              <span class="status-dot offline" id="recipient-dot"></span>
+              <strong id="recipient-name">Select a device</strong>
+            </div>
+          </div>
+          <span id="recipient-state">No recipient</span>
+        </div>
+
+        <nav class="mode-tabs" aria-label="Transfer mode">
+          <button class="tab-button active" type="button" data-tab="paste">⌘ <span>Paste</span></button>
+          <button class="tab-button" type="button" data-tab="files">↥ <span>Files</span></button>
+          <button class="tab-button" type="button" data-tab="activity">≡ <span>Activity</span></button>
+        </nav>
+
+        <section class="tab-view active" id="tab-paste">
+          <div class="section-intro">
+            <p class="eyebrow">Clipboard</p>
+            <h2>Send text instantly</h2>
+            <p>The content is delivered only through this local server.</p>
+          </div>
+          <label class="editor-label" for="message-text">Text to send</label>
+          <textarea id="message-text" maxlength="65536" placeholder="Paste a link, command, note or code snippet…"></textarea>
+          <div class="editor-footer">
+            <span id="message-count">0 / 65,536</span>
+            <button class="primary-button" id="send-message" type="button" disabled>
+              Send text <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="tab-view" id="tab-files">
+          <div class="section-intro">
+            <p class="eyebrow">File transfer</p>
+            <h2>Drop a file for another device</h2>
+            <p>Files are stored temporarily on this machine and expire after 24 hours.</p>
+          </div>
+
+          <label class="drop-zone" id="drop-zone" for="file-input">
+            <input id="file-input" type="file">
+            <span class="drop-icon">↥</span>
+            <strong>Drop a file here</strong>
+            <span>or choose one from this device</span>
+            <small>Maximum size: 512 MB</small>
+          </label>
+
+          <div class="selected-file hidden" id="selected-file">
+            <span class="file-glyph">▤</span>
+            <span class="file-details">
+              <strong id="selected-file-name"></strong>
+              <small id="selected-file-size"></small>
+            </span>
+            <button class="icon-button" id="clear-file" type="button" title="Remove selected file" aria-label="Remove selected file">×</button>
+          </div>
+
+          <div class="upload-progress hidden" id="upload-progress">
+            <div><span id="progress-label">Uploading</span><strong id="progress-value">0%</strong></div>
+            <progress id="progress-bar" max="100" value="0"></progress>
+          </div>
+
+          <div class="file-actions">
+            <button class="primary-button" id="send-file" type="button" disabled>
+              Send file <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="tab-view" id="tab-activity">
+          <div class="section-intro">
+            <p class="eyebrow">Recent activity</p>
+            <h2>Transfers on this device</h2>
+            <p>Messages and files from the current server session.</p>
+          </div>
+          <div class="activity-list" id="activity-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+  <dialog id="device-dialog">
+    <form method="dialog" id="device-form">
+      <div class="dialog-heading">
+        <span class="brand-mark">N</span>
+        <div>
+          <p class="eyebrow">Join this network</p>
+          <h2>Name this device</h2>
+        </div>
+      </div>
+      <label>
+        Device name
+        <input id="device-name-input" maxlength="40" autocomplete="off" required>
+      </label>
+      <label>
+        Device type
+        <select id="device-kind-input">
+          <option value="laptop">Laptop</option>
+          <option value="desktop">Desktop</option>
+          <option value="phone">Phone</option>
+          <option value="tablet">Tablet</option>
+          <option value="device">Other device</option>
+        </select>
+      </label>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancel-device" value="cancel" type="button">Cancel</button>
+        <button class="primary-button" value="default" type="submit">Connect</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/app.js?v=2" defer></script>
+</body>
+</html>
