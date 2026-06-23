@@ -1,4 +1,5 @@
 # NeonDrop
+<img width="3420" height="1496" alt="image" src="https://github.com/user-attachments/assets/462b3168-932b-4a35-a3aa-ed40b8be0e0a" />
 
 NeonDrop is a local-network clipboard and file transfer application written in Go.
 Open one server URL on devices connected to the same Wi-Fi, select an active device,
